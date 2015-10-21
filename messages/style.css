@@ -1,1 +1,18 @@
-/* Your CSS here... */
+h1{
+	font-family: futura;
+}
+
+#message {
+	font-family: futura;
+	font-size: 50px;
+	display: inline-block;
+	background-color: black;
+	color: white;
+	border-radius: 5%;
+	margin: 10px;
+}
+
+#username {
+	display: inline-block;
+	font-family: courier;
+}
