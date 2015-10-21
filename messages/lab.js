@@ -9,7 +9,6 @@ function parse() {
 		if(request.readyState == 4 && request.status == 200){
 			var response = JSON.parse(request.responseText);
 
-
 			elem = document.getElementById("messages");
 			for(key in response){
 				var message = response[key];
