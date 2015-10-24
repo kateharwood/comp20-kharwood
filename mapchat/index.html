@@ -12,13 +12,12 @@
       var myLat = 0;
       var myLng = 0;
       var myLogin = "JoshWright";
-      var me = new google.maps.LatLng(myLat, myLng);
 
       var myOptions = {
-            zoom: 3, // The larger the zoom number, the bigger the zoom
-            center: me,
+            zoom: 15,
             mapTypeId: google.maps.MapTypeId.ROADMAP
           };
+
       var map;
       var marker;
       var infowindow = new google.maps.InfoWindow();
@@ -29,6 +28,7 @@
         getMyLocation();
       }
       
+      // get my current location
       function getMyLocation() {
         if (navigator.geolocation) { // the navigator.geolocation object is supported on your browser
           navigator.geolocation.getCurrentPosition(function(position) {
@@ -42,6 +42,7 @@
         }
       }
 
+      // post location to server and retrieve others locations
       function sendRequest()
       {
           var request = new XMLHttpRequest();
@@ -57,92 +58,78 @@
 
           request.onreadystatechange = function() {
             if(request.readyState == 4 && request.status == 200) {
-              console.log(request.responseText);
               parseResponse(request.responseText);
             }
           }
       }
 
+      // parse data retrieved from server
       function parseResponse(JSONObject)
       {
         var response = JSON.parse(JSONObject);
         for(var key in response) {
             var person = response[key];
-            console.log(response[key]);
-            console.log(person["lat"]);
+            var lat = person["lat"];
+            var lng = person["lng"];
+            var name = person["login"];
+            var message = person["message"];
+            var loc = new google.maps.LatLng(person["lat"], person["lng"]);
 
-
-
-            loc = new google.maps.LatLng(person["lat"], person["lng"])
-            marker = new google.maps.Marker({
-              position: loc,
-              title: person["login"]
-            })
-            marker.setMap(map);
-
-            google.maps.event.addListener(marker, 'click', function() {
-              infowindow.setContent(marker.title);
-              infowindow.open(map, marker);
-            });
-
-
-              /*for(var key in object){
-                    var value = object[key];
-                    var lat = object["lat"];
-                    console.log("this is the lat" + lat);
-                    var lng = value[3];
-                    console.log("this is the lng " + lng);
-                    var person = new google.maps.LatLng(lat, lng);
-
-                  marker = new google.maps.Marker({
-                    position: person,
-                    title: value[1],
-                  })
-
-                  console.log("this is name" + value[1]);
-                  marker.setMap(map);
-
-                    google.maps.event.addListener(marker, 'click', function() {
-                    infowindow.setContent(marker.title);
-                    infowindow.open(map, marker);
-
-                  });
-                }
-
-            for(var key in object){
-             var value = object[key];
-              console.log(value);
-            }*/
+            calculateDistance(lat, lng);
         }
 
+        // haversine formula for distance between two points over the Earth's surface
+        function calculateDistance(otherLat, otherLng){
+            Number.prototype.toRad = function() {
+                 return this * Math.PI / 180;
+            }
 
+            var lat2 = lat; 
+            var lon2 = lng; 
+            var R = 6371; // radius of Earth 
+            var x1 = lat2-myLat;
+            var dLat = x1.toRad();  
+            var x2 = lon2-myLng;
+            var dLon = x2.toRad();  
+            var a = Math.sin(dLat/2) * Math.sin(dLat/2) + 
+                        Math.cos(myLat.toRad()) * Math.cos(myLng.toRad()) * 
+                        Math.sin(dLon/2) * Math.sin(dLon/2);  
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+            var d = R * c;
+            d = Math.round(d * 100) / 100
 
-
-        renderMap();
+            addMarker(map, loc, name, message, d);
+        }
       }
 
-      function renderMap()
+      // add marker on map for every person
+      function addMarker(map, location, title, message, distance) {
+            marker = new google.maps.Marker({
+              position: location, 
+              title: title + "<br>'" + message + "'<br>" + distance + "km from me",
+            });
+
+            marker.setMap(map);
+
+            showInfo(map, marker);
+      }
+
+
+      // show person's info when marker clicked
+      function showInfo(map, marker){
+          google.maps.event.addListener(marker, 'click', function() {
+            infowindow.setContent(marker.title);
+            infowindow.open(map, marker);
+          });
+
+          panTo();
+      }
+
+      // pan to my location
+      function panTo()
       {
         me = new google.maps.LatLng(myLat, myLng);
-        
-        // Update map and go there...
         map.panTo(me);
-  
-        // Create a marker
-        marker = new google.maps.Marker({
-          position: me,
-          title: myLogin
-        });
-        marker.setMap(map);
-          
-        // Open info window on click of marker
-        google.maps.event.addListener(marker, 'click', function() {
-          infowindow.setContent(marker.title);
-          infowindow.open(map, marker);
-
-        });
-
-
       }
 
     </script>
