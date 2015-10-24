@@ -75,17 +75,17 @@
             var message = person["message"];
             var loc = new google.maps.LatLng(person["lat"], person["lng"]);
 
-            calculateDistance(lat, lng);
+            calculateDistance(person);
         }
 
         // haversine formula for distance between two points over the Earth's surface
-        function calculateDistance(otherLat, otherLng){
+        function calculateDistance(person){
             Number.prototype.toRad = function() {
                  return this * Math.PI / 180;
             }
 
-            var lat2 = lat; 
-            var lon2 = lng; 
+            var lat2 = person["lat"]; 
+            var lon2 = person["lng"]; 
             var R = 6371; // radius of Earth 
             var x1 = lat2-myLat;
             var dLat = x1.toRad();  
@@ -98,16 +98,27 @@
             var d = R * c;
             d = Math.round(d * 100) / 100
 
-            addMarker(map, loc, name, message, d);
+            addMarker(map, person, d);
         }
       }
 
       // add marker on map for every person
-      function addMarker(map, location, title, message, distance) {
+      function addMarker(map, person, distance) {
+
+          if(person["login"] == myLogin){
+            var icon = "jackolantern.jpg";
             marker = new google.maps.Marker({
-              position: location, 
-              title: title + "<br>'" + message + "'<br>" + distance + "km from me",
+              position: new google.maps.LatLng(person["lat"], person["lng"]), 
+              title: person["login"] + "<br>'" + person["message"] + "'",
+              icon: icon,
             });
+          }
+          else{
+            marker = new google.maps.Marker({
+              position: new google.maps.LatLng(person["lat"], person["lng"]), 
+              title: person["login"] + "<br>'" + person["message"] + "'<br>" + distance + "km from me",
+            });
+          }
 
             marker.setMap(map);
 
