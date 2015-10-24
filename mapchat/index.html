@@ -3,10 +3,10 @@
 <html>
 
   <head>
-    <title>Geolocation Map Example</title>
+    <title>Where in the world is Comp20?</title>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
     <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=true"></script>
-    <link rel="stylesheet" href="geolocation_map_style.css" />
+    <link rel="stylesheet" href="style.css" />
     
     <script>
       var myLat = 0;
@@ -47,7 +47,7 @@
       {
           var request = new XMLHttpRequest();
           var url = "https://secret-about-box.herokuapp.com/sendLocation";
-          var params = "login=" + myLogin + "&lat="+ myLat + "&lng=" + myLng + "&message=what's gucci";
+          var params = "login=" + myLogin + "&lat="+ myLat + "&lng=" + myLng + "&message=" + encodeURIComponent("I can see Russia from my house");
           request.open("POST", url, true);
 
           request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
@@ -105,18 +105,21 @@
       // add marker on map for every person
       function addMarker(map, person, distance) {
 
+          // my info window
           if(person["login"] == myLogin){
-            var icon = "jackolantern.jpg";
+            var icon = "target.png";
             marker = new google.maps.Marker({
               position: new google.maps.LatLng(person["lat"], person["lng"]), 
-              title: person["login"] + "<br>'" + person["message"] + "'",
-              icon: icon,
+              title: "<div class='login'>" + person["login"] + "</div>" + "<div class='message'>" + person["message"] + "</div>", // don't include distance from myself
+              icon: icon, // my special icon
             });
           }
+
+          // everyone else's info window
           else{
             marker = new google.maps.Marker({
               position: new google.maps.LatLng(person["lat"], person["lng"]), 
-              title: person["login"] + "<br>'" + person["message"] + "'<br>" + distance + "km from me",
+              title: "<div class='login'>" + person["login"] + "</div>" + "<div class='message'> " + person["message"] + "</div>" + "<div class='distance'>" + distance + "km from me" + "</div>",
             });
           }
 
