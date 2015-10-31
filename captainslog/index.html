@@ -11,7 +11,6 @@
 			$("#msg").change(function(){
 				var date = new Date();
 			    localStorage[new Date()] = date.toUTCString() + " " + "-" + " " + $("#msg").val();
-			    console.log("got here");
 			    $("#log").prepend(date.toUTCString() + " " + "-" + " " + $("#msg").val() + "<br>");
 			});
 			    
