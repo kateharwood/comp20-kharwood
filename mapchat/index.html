@@ -46,7 +46,7 @@
       function sendRequest()
       {
           var request = new XMLHttpRequest();
-          var url = "https://secret-about-box.herokuapp.com/sendLocation";
+          var url = "http://localhost:3000/sendLocation";
           var params = "login=" + myLogin + "&lat="+ myLat + "&lng=" + myLng + "&message=" + encodeURIComponent("I can see Russia from my house");
           request.open("POST", url, true);
 
